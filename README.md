@@ -10,8 +10,8 @@ The **Differential Interactome** methodology (Q-value framework) used to quantif
 
 > **Gulfidan, G., Turanli, B., Beklen, H. et al. (2020).**
 > "Pan-cancer mapping of differential protein-protein interactions."
-> *PLoS ONE* 15(3): e0228187.
-> [https://doi.org/10.1371/journal.pone.0228187](https://doi.org/10.1371/journal.pone.0228187)
+> *Scientific Reports* 10, 3272.
+> [https://doi.org/10.1038/s41598-020-60127-x](https://doi.org/10.1038/s41598-020-60127-x)
 
 Protein-protein interaction data: **STRING v12.0** (combined score ≥ 400, taxid 229533 for *F. graminearum*).
 
