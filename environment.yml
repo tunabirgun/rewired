@@ -1,0 +1,45 @@
+# Conda environment for the Fusarium biocontrol RNA-seq meta-analysis pipeline.
+#   conda env create -f environment.yml   &&   conda activate fusarium-biocontrol
+# Versions are the validated ones (see README). If conda cannot solve an exact
+# Bioconductor pin against the R build, relax bioconductor-deseq2 / -apeglm to the
+# release that ships with r-base 4.5.
+name: fusarium-biocontrol
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # ---- raw-read processing (CLI) ----
+  - sra-tools
+  - fastqc=0.12.1
+  - multiqc=1.30
+  - fastp=1.0.1
+  - sortmerna=4.3.4
+  - bbmap=38.96
+  - star=2.7.11b
+  - samtools=1.22.1
+  - subread=2.1.1            # featureCounts
+  # ---- R / Bioconductor (analysis, figures, supplementary) ----
+  - r-base=4.5.3
+  - bioconductor-deseq2=1.50.2
+  - bioconductor-apeglm=1.32.0
+  - r-dplyr=1.2.1
+  - r-readr=2.2.0
+  - r-readxl=1.4.5
+  - r-openxlsx=4.2.8.1
+  - r-tidyr=1.3.2
+  - r-tibble=3.3.1
+  - r-ggplot2=4.0.2
+  - r-ggrepel=0.9.8
+  - r-ggraph=2.2.2
+  - r-igraph=2.2.3
+  - r-pheatmap=1.0.13
+  - r-venndiagram=1.8.2
+  - r-upsetr=1.4.0
+  - r-rcolorbrewer=1.1.3
+  - r-svglite=2.2.2
+  - r-httr=1.4.8
+  - r-tictoc=1.2.1
+  - r-stringr=1.6.0
+  - r-gridextra=2.3
+  - r-futile.logger      # VennDiagram logging backend

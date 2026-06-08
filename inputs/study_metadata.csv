@@ -1,0 +1,9 @@
+Study_No,Study_Name,Organism,Biocontrol_Agent,BCA_Type,Sample_Count,Control_Count
+1,Fungal cross-talk T. gamsii,Fusarium graminearum,Trichoderma gamsii,Fungal,3,3
+2,T. atroviride metabolite profiling,Fusarium graminearum,Trichoderma atroviride,Fungal,2,2
+3,T. hamatum dual RNA-Seq,Fusarium graminearum,Trichoderma hamatum,Fungal,3,3
+4,A. pullulans biocontrol,F. oxysporum,Aureobasidium pullulans,Fungal,3,3
+5,P. aeruginosa Gxun-2,Fusarium oxysporum,Pseudomonas aeruginosa,Bacterial,3,3
+6,B. velezensis YB-185,Fusarium pseudograminearum,Bacillus velezensis,Bacterial,3,3
+7,B. subtilis HSY21,Fusarium oxysporum f. sp. lycopersici,Bacillus subtilis HSY21,Bacterial,6,3
+8,B. amyloliquefaciens myriocin,Fusarium oxysporum f. sp. niveum,Bacillus amyloliquefaciens LZN01,Bacterial,6,3
