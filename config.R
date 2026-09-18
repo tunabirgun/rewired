@@ -19,12 +19,20 @@ get_script_dir <- function() {
 }
 
 SCRIPT_DIR <- get_script_dir()
-BASE_DIR   <- normalizePath(file.path(SCRIPT_DIR, ".."), mustWork = FALSE)
+# Project root: the directory that holds data/. That is the repository root (scripts beside
+# data/) or, in the original layout, the parent of a codes/ directory that holds the scripts.
+BASE_DIR   <- if (dir.exists(file.path(SCRIPT_DIR, "data"))) {
+    SCRIPT_DIR
+} else if (dir.exists(file.path(SCRIPT_DIR, "..", "data"))) {
+    normalizePath(file.path(SCRIPT_DIR, ".."), mustWork = FALSE)
+} else {
+    SCRIPT_DIR
+}
 
 # Validate project root — require data/counts/ or data/degs/ subdirectory
 if (!dir.exists(file.path(BASE_DIR, "data", "counts")) && !dir.exists(file.path(BASE_DIR, "data", "degs"))) {
     stop("Cannot locate project root. Expected 'data/counts/' or 'data/degs/' under: ", BASE_DIR,
-         "\nRun scripts from the scripts/ directory or set .script_dir_override.")
+         "\nRun the scripts from the repository root (after 03_align_quantify.sh) or set .script_dir_override.")
 }
 
 # Directory tree

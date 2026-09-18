@@ -10,38 +10,41 @@ doi:10.1038/s41598-020-60127-x.**
 
 ## Layout
 
+The repository root is the project root: the scripts write `data/`, `resources/` and `outputs/` beside themselves, and the large STRING files go in `string_data/`.
+
 ```text
-codes/
-  config.R                      shared configuration (paths, thresholds, study metadata, seed=42)
-  environment.yml               conda environment (CLI tools + R/Bioconductor packages)
-  inputs/                       bundled small inputs (sample sheet, metadata, KEGG KO, UniProt GO)
-  .gitignore                    excludes the large STRING files from commits
+config.R                      shared configuration (paths, thresholds, study metadata, seed=42)
+environment.yml               conda environment (CLI tools + R/Bioconductor packages)
+inputs/                       bundled small inputs (sample sheet, metadata, KEGG KO, UniProt GO)
+.gitignore                    excludes data/, string_data/, resources/ and outputs/ from commits
 
-  # ---- backbone: SRA -> rewired proteins ----
-  01_download_sra.sh            prefetch + fasterq-dump        -> data/raw/<study>/*.fastq.gz
-  02_preprocess.sh              FastQC, fastp, SortMeRNA, BBMap, MultiQC -> data/clean/<study>/clean/
-  03_align_quantify.sh          STAR + featureCounts           -> data/counts/<study>.txt
-  04_differential_expression.R  DESeq2 (apeglm shrinkage)       -> data/degs/, outputs/differential_expression/
-  05_orthology_mapping.R        KO-based FOXG/FPSE -> FGSG       -> resources/
-  06_differential_interactome.R Q-value differential interactome-> outputs/differential_interactome/
-  07_rewired_analysis.R         rewired-protein classification  -> outputs/rewired_analysis/
+# ---- backbone: SRA -> rewired proteins ----
+01_download_sra.sh            prefetch + fasterq-dump        -> data/raw/<study>/*.fastq.gz
+02_preprocess.sh              FastQC, fastp, SortMeRNA, BBMap, MultiQC -> data/clean/<study>/clean/
+03_align_quantify.sh          STAR + featureCounts           -> data/counts/<study>.txt
+04_differential_expression.R  DESeq2 (apeglm shrinkage)       -> data/degs/, outputs/differential_expression/
+05_orthology_mapping.R        KO-based FOXG/FPSE -> FGSG       -> resources/
+06_differential_interactome.R Q-value differential interactome-> outputs/differential_interactome/
+07_rewired_analysis.R         rewired-protein classification  -> outputs/rewired_analysis/
 
-  # ---- downstream: enrichment, modules, figures, supplementary ----
-  08_enrichment.R               KEGG/GO hypergeometric enrichment (DEGs + rewired)
-  09_network_modules.R          aggregated networks + Louvain modules
-  10_figures_volcano.R          volcano panel with rewired overlay (Fig 4)
-  11_figures_overlaps.R         DEG/rewired Venn + UpSet + classification (Figs 2, 3, 5, 6)
-  12_figures_marker.R           marker-gene heatmap (Fig 8)
-  13_supplementary_tables.R     Supplementary Tables S1-S9
+# ---- downstream: enrichment, modules, figures, supplementary ----
+08_enrichment.R               KEGG/GO hypergeometric enrichment (DEGs + rewired)
+09_network_modules.R          aggregated networks + Louvain modules
+10_figures_volcano.R          volcano panel with rewired overlay (Fig 4)
+11_figures_overlaps.R         DEG/rewired Venn + UpSet + classification (Figs 2, 3, 5, 6)
+12_figures_marker.R           marker-gene heatmap (Fig 8)
+13_supplementary_tables.R     Supplementary Tables S1-S9
 ```
+
+The scripts also run from a `codes/` sub-directory of a project root that already holds `data/` (the layout the original analysis used); `config.R` detects which layout is present.
 
 ## Inputs
 
-The small inputs are bundled in `codes/inputs/`; the large STRING network and the genome references
+The small inputs are bundled in `inputs/`; the large STRING network and the genome references
 are not committed (too large for git) and are downloaded once. `config.R` reads the small inputs from
-`codes/inputs/` and the large STRING files from `../string_data/`.
+`inputs/` and the large STRING files from `string_data/` at the project root.
 
-**Bundled in `codes/inputs/` (provided):**
+**Bundled in `inputs/` (provided):**
 
 - `study_table.csv`, `study_metadata.csv` — sample sheet / study metadata; the sample sheet drives the
   download loop and the control/treatment assignment (one row per run).
@@ -51,7 +54,7 @@ are not committed (too large for git) and are downloaded once. `config.R` reads 
 
 **Download once (not in git):**
 
-- **STRING v12.0** → place in `string_data/` at the project root. From <https://string-db.org>
+- **STRING v12.0** → place in `string_data/` at the project root (the repository root). From <https://string-db.org>
   (version 12.0): `229533.protein.links.v12.0.txt` + `229533.protein.aliases.v12.0.txt`
   (*F. graminearum*, taxid 229533) and `426428.protein.aliases.v12.0.txt` (*F. oxysporum*, taxid
   426428). The `.protein.links` file is ~100 MB, which is why it is kept out of the repository.
@@ -65,22 +68,26 @@ are not committed (too large for git) and are downloaded once. `config.R` reads 
 
 ## Run order
 
+Run every command from the repository root.
+
 ```bash
+git clone https://github.com/tunabirgun/rewired.git && cd rewired
+conda env create -f environment.yml && conda activate fusarium-biocontrol
 # backbone (run the heavy CLI steps on Linux/HPC)
-bash codes/01_download_sra.sh
-THREADS=8  SORTMERNA_DB=~/sortmerna/database/smr_v4.3_default_db.fasta  bash codes/02_preprocess.sh
-THREADS=12 bash codes/03_align_quantify.sh
-Rscript codes/04_differential_expression.R
-Rscript codes/05_orthology_mapping.R
-Rscript codes/06_differential_interactome.R     # heavy: STRING co-expression over 8 studies
-Rscript codes/07_rewired_analysis.R
+bash 01_download_sra.sh
+THREADS=8  SORTMERNA_DB=~/sortmerna/database/smr_v4.3_default_db.fasta  bash 02_preprocess.sh
+THREADS=12 bash 03_align_quantify.sh
+Rscript 04_differential_expression.R
+Rscript 05_orthology_mapping.R
+Rscript 06_differential_interactome.R     # heavy: STRING co-expression over 8 studies
+Rscript 07_rewired_analysis.R
 # downstream
-Rscript codes/08_enrichment.R
-Rscript codes/09_network_modules.R
-Rscript codes/10_figures_volcano.R
-Rscript codes/11_figures_overlaps.R
-Rscript codes/12_figures_marker.R
-Rscript codes/13_supplementary_tables.R
+Rscript 08_enrichment.R
+Rscript 09_network_modules.R
+Rscript 10_figures_volcano.R
+Rscript 11_figures_overlaps.R
+Rscript 12_figures_marker.R
+Rscript 13_supplementary_tables.R
 ```
 
 ## Key parameters to check (all centralised in `config.R`)

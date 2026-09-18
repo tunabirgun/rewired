@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # 01_download_sra.sh — download raw reads from NCBI SRA, convert to gzipped paired FASTQ.
 # Tool: sra-tools (prefetch, fasterq-dump).
-# Driven by the sample sheet metadata/study_table.csv
+# Driven by the sample sheet inputs/study_table.csv (next to this script; override with $1)
 #   columns: Study No., Study, Organism, Biocontrol Agent, Experimental Condition,
 #            SRA Accession, Control/Sample, BCA Type
 # Output: data/raw/<study>/<SRR>_1.fastq.gz , <SRR>_2.fastq.gz
 set -euo pipefail
 
-SAMPLES="${1:-metadata/study_table.csv}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SAMPLES="${1:-$SCRIPT_DIR/inputs/study_table.csv}"
 RAW="data/raw"
 THREADS="${THREADS:-8}"
 mkdir -p "$RAW"
